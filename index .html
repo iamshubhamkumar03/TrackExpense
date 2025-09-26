@@ -45,10 +45,8 @@
 </head>
 <body class="min-h-screen">
 
-    <!-- Notification Container -->
     <div id="notification-container" class="fixed top-5 right-5 z-50 w-full max-w-sm space-y-3"></div>
 
-    <!-- Loading Spinner -->
     <div id="loading-spinner" class="fixed inset-0 bg-white bg-opacity-80 flex items-center justify-center z-50 transition-opacity duration-300">
         <svg class="animate-spin h-10 w-10 text-amber-800" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -56,12 +54,10 @@
         </svg>
     </div>
     
-    <!-- Login Screen -->
     <div id="login-screen" class="min-h-screen flex flex-col items-center justify-center p-4">
         <div class="text-center space-y-6 card-style p-10 rounded-2xl max-w-lg">
-            <!-- Logo and Title -->
             <div class="flex flex-col items-center justify-center gap-2">
-                 <img src="expTracker logo.png" alt="Track Expenses Logo" class="w-20 h-20 mb-2">
+                 <img src="logo.png" alt="Track Expenses Logo" class="w-20 h-20 mb-2">
                  <h1 class="text-4xl md:text-5xl tracking-wider">Track Expenses</h1>
                  <p class="text-lg text-amber-800/90 subtitle italic font-semibold mt-1">Don't just pay, Track It.</p>
             </div>
@@ -78,12 +74,10 @@
         </div>
     </div>
 
-    <!-- Main App Screen -->
     <div id="app-screen" class="hidden max-w-7xl mx-auto p-4 md:p-8">
-        <!-- Header -->
         <header class="flex flex-wrap justify-between items-center gap-4 mb-8">
             <div class="flex items-center gap-3">
-                 <img src="expTracker logo.png" alt="Track Expenses Logo" class="w-12 h-12">
+                 <img src="logo.png" alt="Track Expenses Logo" class="w-12 h-12">
                  <div>
                     <h1 class="text-3xl tracking-wider">Track Expenses</h1>
                     <p class="text-xs text-amber-800/90 subtitle italic font-semibold">Don't just pay, Track It.</p>
@@ -99,7 +93,6 @@
             </div>
         </header>
 
-        <!-- Budget Summary Cards -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div class="card-style rounded-xl p-6">
                 <h2 class="text-sm tracking-wide font-semibold text-gray-500 mb-2 subtitle">MONTHLY BUDGET</h2>
@@ -115,7 +108,6 @@
             </div>
         </div>
 
-        <!-- Chart Section -->
         <div class="card-style rounded-xl p-6 mb-8">
             <h3 id="chart-title" class="text-2xl mb-4">Category Spending</h3>
             <div class="relative h-64 md:h-80">
@@ -123,9 +115,7 @@
             </div>
         </div>
 
-        <!-- Forms Section -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <!-- Set Budget Form -->
             <div class="card-style rounded-xl p-6">
                 <h3 class="text-2xl mb-4">Manage Monthly Budget</h3>
                 <form id="budget-form" class="flex items-center gap-4">
@@ -133,8 +123,7 @@
                     <button type="submit" class="bg-amber-800 hover:bg-amber-900 text-white btn-primary py-2 px-6">Set</button>
                 </form>
             </div>
-             <!-- Add Expense Form -->
-            <div class="card-style rounded-xl p-6">
+             <div class="card-style rounded-xl p-6">
                 <h3 class="text-2xl mb-4">Add New Expense</h3>
                 <form id="expense-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <input type="text" id="expense-name" placeholder="Expense name" class="input-style sm:col-span-1" required>
@@ -157,17 +146,14 @@
             </div>
         </div>
         
-        <!-- Expenses Lists Section -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Upcoming Expenses -->
             <div class="card-style rounded-xl p-6">
                 <h3 id="upcoming-expenses-title" class="text-2xl mb-4">Upcoming Planned Expenses</h3>
                 <div id="upcoming-expenses-list" class="space-y-3 max-h-96 overflow-y-auto no-scrollbar">
                     <p id="no-upcoming" class="text-gray-500 text-center py-4 subtitle">No upcoming expenses planned.</p>
                 </div>
             </div>
-             <!-- Paid Expenses -->
-            <div class="card-style rounded-xl p-6">
+             <div class="card-style rounded-xl p-6">
                 <h3 id="paid-expenses-title" class="text-2xl mb-4">Paid Expenses History</h3>
                 <div id="paid-expenses-list" class="space-y-3 max-h-96 overflow-y-auto no-scrollbar">
                      <p id="no-paid" class="text-gray-500 text-center py-4 subtitle">No paid expenses yet.</p>
@@ -175,7 +161,6 @@
             </div>
         </div>
 
-        <!-- Important Notes Section -->
         <div class="card-style rounded-xl p-6 mt-8">
             <h3 class="text-2xl mb-4">Important Notes for the Month</h3>
             <form id="notes-form" class="flex items-start gap-4 mb-4">
@@ -189,7 +174,6 @@
 
     </div>
 
-    <!-- Firebase SDKs -->
     <script type="module">
         // --- Firebase Imports ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -672,4 +656,3 @@
     </script>
 </body>
 </html>
-
