@@ -4,12 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Track Expenses - Your Personal Expense Tracker</title>
+    <!-- Load Tailwind CSS and Chart.js -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Inter Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Times+New+Roman&display=swap" rel="stylesheet">
+    
     <style>
+        /* CSS from style.css and index.html <style> block combined */
+        html {
+            height: 100%;
+            width: 100%;
+        }
         body {
             font-family: 'Inter', sans-serif;
             color: #6D4C41; /* Main brown text color */
@@ -34,10 +42,31 @@
             box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.05);
         }
         .btn-primary {
-            @apply font-semibold py-3 px-8 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105;
+            font-weight: 600;
+            padding: 0.75rem 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+            transform: scale(1);
+        }
+        .btn-primary:hover {
+            transform: scale(1.05);
         }
         .input-style {
-            @apply w-full bg-gray-50 text-gray-800 placeholder-gray-500 border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-amber-700;
+            width: 100%;
+            background-color: #f9fafb;
+            color: #1f2937;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+        }
+        .input-style::placeholder {
+            color: #6b7280;
+        }
+        .input-style:focus {
+            outline: none;
+            ring: 2px solid #92400e;
+            box-shadow: 0 0 0 2px #92400e;
         }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -45,8 +74,10 @@
 </head>
 <body class="min-h-screen">
 
+    <!-- Notification Container (replaces alert/confirm) -->
     <div id="notification-container" class="fixed top-5 right-5 z-50 w-full max-w-sm space-y-3"></div>
 
+    <!-- Loading Spinner -->
     <div id="loading-spinner" class="fixed inset-0 bg-white bg-opacity-80 flex items-center justify-center z-50 transition-opacity duration-300">
         <svg class="animate-spin h-10 w-10 text-amber-800" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -54,60 +85,74 @@
         </svg>
     </div>
     
+    <!-- Login Screen -->
     <div id="login-screen" class="min-h-screen flex flex-col items-center justify-center p-4">
         <div class="text-center space-y-6 card-style p-10 rounded-2xl max-w-lg">
             <div class="flex flex-col items-center justify-center gap-2">
-                 <img src="logo.png" alt="Track Expenses Logo" class="w-20 h-20 mb-2">
+                 <div class="w-20 h-20 bg-amber-800 rounded-full flex items-center justify-center mb-4">
+                    <!-- Rupee Icon (₹) -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="6" y1="7" x2="18" y2="7"/>
+                        <line x1="6" y1="12" x2="18" y2="12"/>
+                        <path d="M12 12v9"/>
+                        <path d="M16 12a4 4 0 0 0-4-4h-2a4 4 0 0 0-4 4v5"/>
+                    </svg>
+                 </div>
                  <h1 class="text-4xl md:text-5xl tracking-wider">Track Expenses</h1>
                  <p class="text-lg text-amber-800/90 subtitle italic font-semibold mt-1">Don't just pay, Track It.</p>
             </div>
-            <p class="text-lg text-gray-600 max-w-md mx-auto subtitle font-medium">Take control of your finances. Track expenses, manage budgets, and achieve your financial goals effortlessly.</p>
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-                <button id="google-login-btn" class="w-full sm:w-auto flex items-center justify-center gap-3 bg-white text-gray-800 btn-primary border border-gray-300 hover:bg-gray-50">
-                    <svg class="w-6 h-6" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C12.955 4 4 12.955 4 24s8.955 20 20 20s20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/><path fill="#FF3D00" d="m6.306 14.691l6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4C16.318 4 9.656 8.337 6.306 14.691z"/><path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238C29.211 35.091 26.715 36 24 36c-5.222 0-9.612-3.246-11.408-7.731l-6.522 5.025C9.505 39.556 16.227 44 24 44z"/><path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-.792 2.237-2.231 4.166-4.087 5.571l6.19 5.238C42.022 35.253 44 30.022 44 24c0-1.341-.138-2.65-.389-3.917z"/></svg>
-                    Sign in with Google
-                </button>
-                <button id="guest-login-btn" class="w-full sm:w-auto bg-amber-800 hover:bg-amber-900 text-white btn-primary">
-                    Continue as Guest
-                </button>
-            </div>
+            <!-- Text updated to remove "using local storage" -->
+            <p class="text-lg text-gray-600 max-w-md mx-auto subtitle font-medium">Take control of your finances. Tracking is now enabled for all users automatically.</p>
+            <button id="start-tracking-btn" class="bg-amber-800 hover:bg-amber-900 text-white btn-primary w-full font-semibold py-3 px-8 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105">
+                Start Tracking My Expenses
+            </button>
         </div>
     </div>
 
+    <!-- Main Application Screen -->
     <div id="app-screen" class="hidden max-w-7xl mx-auto p-4 md:p-8">
         <header class="flex flex-wrap justify-between items-center gap-4 mb-8">
             <div class="flex items-center gap-3">
-                 <img src="logo.png" alt="Track Expenses Logo" class="w-12 h-12">
+                 <div class="w-12 h-12 bg-amber-800 rounded-full flex items-center justify-center">
+                    <!-- Rupee Icon (₹) -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="6" y1="7" x2="18" y2="7"/>
+                        <line x1="6" y1="12" x2="18" y2="12"/>
+                        <path d="M12 12v9"/>
+                        <path d="M16 12a4 4 0 0 0-4-4h-2a4 4 0 0 0-4 4v5"/>
+                    </svg>
+                 </div>
                  <div>
-                    <h1 class="text-3xl tracking-wider">Track Expenses</h1>
-                    <p class="text-xs text-amber-800/90 subtitle italic font-semibold">Don't just pay, Track It.</p>
+                     <h1 class="text-3xl tracking-wider">Track Expenses</h1>
+                     <p class="text-xs text-amber-800/90 subtitle italic font-semibold">Don't just pay, Track It.</p>
                  </div>
             </div>
             <div class="flex items-center gap-4">
                 <div class="flex items-center gap-2">
                     <label for="month-selector" class="font-bold subtitle text-gray-600">Viewing:</label>
-                    <input type="month" id="month-selector" class="input-style">
+                    <input type="month" id="month-selector" class="input-style w-full bg-gray-50 text-gray-800 border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-amber-700">
                 </div>
-                <div id="user-info" class="text-right hidden sm:block"></div>
-                <button id="logout-btn" class="bg-red-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-red-700 transition-colors duration-300">Logout</button>
+                <!-- REMOVED: The unnecessary div block that was displaying "User" and "Local App Storage" -->
             </div>
         </header>
 
+        <!-- Summary Cards -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div class="card-style rounded-xl p-6">
-                <h2 class="text-sm tracking-wide font-semibold text-gray-500 mb-2 subtitle">MONTHLY BUDGET</h2>
+                <h2 class="text-sm tracking-wide font-semibold text-gray-500 mb-2 subtitle">MONTHLY BUDGET (₹)</h2>
                 <p id="total-budget" class="text-4xl font-bold text-amber-900">₹0.00</p>
             </div>
             <div class="card-style rounded-xl p-6">
-                <h2 class="text-sm tracking-wide font-semibold text-gray-500 mb-2 subtitle">MONTHLY SPENT</h2>
+                <h2 class="text-sm tracking-wide font-semibold text-gray-500 mb-2 subtitle">MONTHLY SPENT (₹)</h2>
                 <p id="total-spent" class="text-4xl font-bold text-red-600">₹0.00</p>
             </div>
             <div class="card-style rounded-xl p-6">
-                <h2 class="text-sm tracking-wide font-semibold text-gray-500 mb-2 subtitle">REMAINING</h2>
+                <h2 class="text-sm tracking-wide font-semibold text-gray-500 mb-2 subtitle">REMAINING (₹)</h2>
                 <p id="remaining-budget" class="text-4xl font-bold text-green-600">₹0.00</p>
             </div>
         </div>
 
+        <!-- Chart -->
         <div class="card-style rounded-xl p-6 mb-8">
             <h3 id="chart-title" class="text-2xl mb-4">Category Spending</h3>
             <div class="relative h-64 md:h-80">
@@ -115,20 +160,21 @@
             </div>
         </div>
 
+        <!-- Forms -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             <div class="card-style rounded-xl p-6">
                 <h3 class="text-2xl mb-4">Manage Monthly Budget</h3>
                 <form id="budget-form" class="flex items-center gap-4">
-                    <input type="number" id="budget-input" placeholder="Enter budget for selected month" class="input-style" required>
-                    <button type="submit" class="bg-amber-800 hover:bg-amber-900 text-white btn-primary py-2 px-6">Set</button>
+                    <input type="number" id="budget-input" placeholder="Enter budget for selected month" class="input-style w-full bg-gray-50 text-gray-800 placeholder-gray-500 border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-amber-700" required>
+                    <button type="submit" class="bg-amber-800 hover:bg-amber-900 text-white btn-primary py-2 px-6 font-semibold rounded-lg shadow-md transition-all duration-300 transform hover:scale-105">Set</button>
                 </form>
             </div>
              <div class="card-style rounded-xl p-6">
                 <h3 class="text-2xl mb-4">Add New Expense</h3>
                 <form id="expense-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <input type="text" id="expense-name" placeholder="Expense name" class="input-style sm:col-span-1" required>
-                    <input type="number" id="expense-amount" placeholder="Amount (₹)" class="input-style sm:col-span-1" required>
-                    <select id="expense-category" class="input-style sm:col-span-1" required>
+                    <input type="text" id="expense-name" placeholder="Expense name" class="input-style sm:col-span-1 w-full bg-gray-50 text-gray-800 placeholder-gray-500 border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-amber-700" required>
+                    <input type="number" id="expense-amount" placeholder="Amount (₹)" class="input-style sm:col-span-1 w-full bg-gray-50 text-gray-800 placeholder-gray-500 border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-amber-700" required>
+                    <select id="expense-category" class="input-style sm:col-span-1 w-full bg-gray-50 text-gray-800 border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-amber-700" required>
                         <option value="Shopping">Shopping</option>
                         <option value="Bills">Bills</option>
                         <option value="Food">Food</option>
@@ -140,12 +186,13 @@
                         <option value="Hangouts">Hangouts</option>
                         <option value="Other">Other</option>
                     </select>
-                    <input type="datetime-local" id="expense-due-date" class="input-style sm:col-span-1" required>
-                    <button type="submit" class="sm:col-span-2 w-full bg-green-700 hover:bg-green-800 text-white btn-primary py-2 px-6">Add Expense to Selected Month</button>
+                    <input type="datetime-local" id="expense-due-date" class="input-style sm:col-span-1 w-full bg-gray-50 text-gray-800 border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-amber-700" required>
+                    <button type="submit" class="sm:col-span-2 w-full bg-green-700 hover:bg-green-800 text-white btn-primary py-2 px-6 font-semibold rounded-lg shadow-md transition-all duration-300 transform hover:scale-105">Add Expense to Selected Month</button>
                 </form>
             </div>
         </div>
         
+        <!-- Expense Lists -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div class="card-style rounded-xl p-6">
                 <h3 id="upcoming-expenses-title" class="text-2xl mb-4">Upcoming Planned Expenses</h3>
@@ -156,16 +203,17 @@
              <div class="card-style rounded-xl p-6">
                 <h3 id="paid-expenses-title" class="text-2xl mb-4">Paid Expenses History</h3>
                 <div id="paid-expenses-list" class="space-y-3 max-h-96 overflow-y-auto no-scrollbar">
-                     <p id="no-paid" class="text-gray-500 text-center py-4 subtitle">No paid expenses yet.</p>
+                    <p id="no-paid" class="text-gray-500 text-center py-4 subtitle">No paid expenses yet.</p>
                 </div>
             </div>
         </div>
 
+        <!-- Notes Section -->
         <div class="card-style rounded-xl p-6 mt-8">
             <h3 class="text-2xl mb-4">Important Notes for the Month</h3>
             <form id="notes-form" class="flex items-start gap-4 mb-4">
-                <textarea id="note-input" placeholder="Add a note (e.g., reminder for annual insurance payment)" class="input-style min-h-[40px] resize-y" rows="1" required></textarea>
-                <button type="submit" class="bg-sky-700 hover:bg-sky-800 text-white btn-primary py-2 px-6 flex-shrink-0">Save Note</button>
+                <textarea id="note-input" placeholder="Add a note (e.g., reminder for annual insurance payment)" class="input-style min-h-[40px] resize-y w-full bg-gray-50 text-gray-800 placeholder-gray-500 border border-gray-300 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-amber-700" rows="1" required></textarea>
+                <button type="submit" class="bg-sky-700 hover:bg-sky-800 text-white btn-primary py-2 px-6 flex-shrink-0 font-semibold rounded-lg shadow-md transition-all duration-300 transform hover:scale-105">Save Note</button>
             </form>
             <div id="notes-list" class="space-y-2 max-h-48 overflow-y-auto no-scrollbar">
                 <p id="no-notes" class="text-gray-500 text-center py-4 subtitle">No important notes for this month.</p>
@@ -174,485 +222,518 @@
 
     </div>
 
-    <script type="module">
-        // --- Firebase Imports ---
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, onSnapshot, updateDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    <!-- Combined JavaScript Logic (from script.js) -->
+    <script>
+        // Use an IIFE (Immediately Invoked Function Expression) to contain the logic
+        (function() {
+            // --- DOM Elements ---
+            const notificationContainer = document.getElementById('notification-container');
+            const loadingSpinner = document.getElementById('loading-spinner');
+            const loginScreen = document.getElementById('login-screen');
+            const appScreen = document.getElementById('app-screen');
+            const startTrackingBtn = document.getElementById('start-tracking-btn');
+            // const userInfoDiv = document.getElementById('user-info'); // Not used in JS
+            const monthSelector = document.getElementById('month-selector');
+            const budgetForm = document.getElementById('budget-form');
+            const budgetInput = document.getElementById('budget-input');
+            const totalBudgetEl = document.getElementById('total-budget');
+            const totalSpentEl = document.getElementById('total-spent');
+            const remainingBudgetEl = document.getElementById('remaining-budget');
+            const expenseForm = document.getElementById('expense-form');
+            const expenseNameInput = document.getElementById('expense-name');
+            const expenseAmountInput = document.getElementById('expense-amount');
+            const expenseCategorySelect = document.getElementById('expense-category');
+            const expenseDueDateInput = document.getElementById('expense-due-date');
+            const upcomingList = document.getElementById('upcoming-expenses-list');
+            const paidList = document.getElementById('paid-expenses-list');
+            // const noUpcomingMsg = document.getElementById('no-upcoming'); // Dynamically replaced
+            // const noPaidMsg = document.getElementById('no-paid'); // Dynamically replaced
+            const upcomingTitleEl = document.getElementById('upcoming-expenses-title');
+            const paidTitleEl = document.getElementById('paid-expenses-title');
+            const notesForm = document.getElementById('notes-form');
+            const noteInput = document.getElementById('note-input');
+            const notesList = document.getElementById('notes-list');
+            // const noNotesMsg = document.getElementById('no-notes'); // Dynamically replaced
+            const chartCanvas = document.getElementById('expense-chart');
+            const chartTitleEl = document.getElementById('chart-title');
 
-        // --- Firebase Configuration ---
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'trackexpenses-demo';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { /* Your default config for local testing */ };
-        
-        // --- Initialize Firebase ---
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+            // Global Variables
+            let selectedYearMonth = '';
+            let expenseChart = null;
+            let currentBudget = 0;
+            let currentExpenses = [];
+            let currentNotes = [];
 
-        // --- DOM Elements ---
-        const notificationContainer = document.getElementById('notification-container');
-        const loadingSpinner = document.getElementById('loading-spinner');
-        const loginScreen = document.getElementById('login-screen');
-        const appScreen = document.getElementById('app-screen');
-        const googleLoginBtn = document.getElementById('google-login-btn');
-        const guestLoginBtn = document.getElementById('guest-login-btn');
-        const logoutBtn = document.getElementById('logout-btn');
-        const userInfoDiv = document.getElementById('user-info');
-        const monthSelector = document.getElementById('month-selector');
-        
-        const budgetForm = document.getElementById('budget-form');
-        const budgetInput = document.getElementById('budget-input');
-        const totalBudgetEl = document.getElementById('total-budget');
-        const totalSpentEl = document.getElementById('total-spent');
-        const remainingBudgetEl = document.getElementById('remaining-budget');
+            // Category Icons (Lucide Icons used, converted to SVG strings)
+            const categoryIcons = {
+                Shopping: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-amber-700"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>`,
+                Bills: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-orange-700"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`,
+                Food: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-yellow-700"><path d="M3 21h18M7 21V11c0-2.2 1.8-4 4-4h2c2.2 0 4 1.8 4 4v10M7 7c0-2.2 1.8-4 4-4s4 1.8 4 4"/><path d="M12 11v10"/></svg>`,
+                Groceries: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-green-700"><path d="m5 11 4-7"/><path d="m19 11-4-7"/><path d="M2 11h20"/><path d="m3.5 11 1.6 7.4a2 2 0 0 0 2 1.6h9.8a2 2 0 0 0 2-1.6l1.6-7.4"/><path d="m9 11 1 9"/><path d="M4.5 15.5h15"/></svg>`,
+                Entertainment: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-red-700"><path d="m12 8 2 5 5 2-5 2-2 5-2-5-5-2 5-2 2-5z"/><path d="M20 3h-2"/><path d="M22 5v-2"/><path d="m2.5 15.5 1.5 1.5"/><path d="M20 21h2"/><path d="M22 19v2"/><path d="m15.5 2.5 1.5-1.5"/><path d="m4 3h2"/><path d="M2 5V3"/><path d="M4 21H2"/><path d="M2 19v-2"/></svg>`,
+                Transport: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-teal-700"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1 .4-1 1v1"/><path d="M16 17H5c-1.1 0-2-.9-2-2V7c0-1.1.9-2 2-2h8c.7 0 1.3.3 1.8.7l1.9 1.9c.5.4.9 1.1 1.3 1.9.4.8 2.2 1.9 2.2 1.9V17Z"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>`,
+                Health: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-lime-700"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M12 11h4v4"/></svg>`,
+                Education: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-indigo-700"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`,
+                Hangouts: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-pink-700"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg>`,
+                Other: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-gray-600"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>`,
+            };
 
-        const expenseForm = document.getElementById('expense-form');
-        const expenseNameInput = document.getElementById('expense-name');
-        const expenseAmountInput = document.getElementById('expense-amount');
-        const expenseCategorySelect = document.getElementById('expense-category');
-        const expenseDueDateInput = document.getElementById('expense-due-date');
-
-        const upcomingList = document.getElementById('upcoming-expenses-list');
-        const paidList = document.getElementById('paid-expenses-list');
-        const noUpcomingMsg = document.getElementById('no-upcoming');
-        const noPaidMsg = document.getElementById('no-paid');
-        const upcomingTitleEl = document.getElementById('upcoming-expenses-title');
-        const paidTitleEl = document.getElementById('paid-expenses-title');
-
-        const notesForm = document.getElementById('notes-form');
-        const noteInput = document.getElementById('note-input');
-        const notesList = document.getElementById('notes-list');
-        const noNotesMsg = document.getElementById('no-notes');
-        
-        const chartCanvas = document.getElementById('expense-chart');
-        const chartTitleEl = document.getElementById('chart-title');
-        
-        let currentUserId = null;
-        let selectedYearMonth = '';
-        let unsubscribeBudget = () => {};
-        let unsubscribeExpenses = () => {};
-        let unsubscribeNotes = () => {};
-        let expenseChart = null;
-        let currentBudget = 0;
-        let currentExpenses = [];
-
-
-        // --- Category Icons ---
-        const categoryIcons = {
-            Shopping: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-amber-700"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>`,
-            Bills: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-orange-700"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`,
-            Food: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-yellow-700"><path d="M3 21h18M7 21V11c0-2.2 1.8-4 4-4h2c2.2 0 4 1.8 4 4v10M7 7c0-2.2 1.8-4 4-4s4 1.8 4 4"/><path d="M12 11v10"/></svg>`,
-            Groceries: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-green-700"><path d="m5 11 4-7"/><path d="m19 11-4-7"/><path d="M2 11h20"/><path d="m3.5 11 1.6 7.4a2 2 0 0 0 2 1.6h9.8a2 2 0 0 0 2-1.6l1.6-7.4"/><path d="m9 11 1 9"/><path d="M4.5 15.5h15"/></svg>`,
-            Entertainment: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-red-700"><path d="m12 8 2 5 5 2-5 2-2 5-2-5-5-2 5-2 2-5z"/><path d="M20 3h-2"/><path d="M22 5v-2"/><path d="m2.5 15.5 1.5 1.5"/><path d="M20 21h2"/><path d="M22 19v2"/><path d="m15.5 2.5 1.5-1.5"/><path d="m4 3h2"/><path d="M2 5V3"/><path d="M4 21H2"/><path d="M2 19v-2"/></svg>`,
-            Transport: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-teal-700"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1 .4-1 1v1"/><path d="M16 17H5c-1.1 0-2-.9-2-2V7c0-1.1.9-2 2-2h8c.7 0 1.3.3 1.8.7l1.9 1.9c.5.4.9 1.1 1.3 1.9.4.8 2.2 1.9 2.2 1.9V17Z"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>`,
-            Health: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-lime-700"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M12 11h4v4"/></svg>`,
-            Education: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-indigo-700"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>`,
-            Hangouts: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-pink-700"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg>`,
-            Other: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-gray-600"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>`,
-        };
-        
-        // --- Date & Time Helpers ---
-        function setInitialMonth() {
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = (now.getMonth() + 1).toString().padStart(2, '0');
-            selectedYearMonth = `${year}-${month}`;
-            monthSelector.value = selectedYearMonth;
-        }
-
-        function getRelativeDueDate(dueDateString) {
-            const now = new Date();
-            const dueDate = new Date(dueDateString);
-            const diffTime = dueDate.getTime() - now.getTime();
-            
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            const dueDay = new Date(dueDateString);
-            dueDay.setHours(0, 0, 0, 0);
-            
-            const dayDiff = Math.round((dueDay.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-            const timeFormat = { hour: '2-digit', minute: '2-digit' };
-
-            if (diffTime < 0) {
-                return `<span class="text-red-500 font-semibold">Overdue</span>`;
-            }
-            if (dayDiff === 0) {
-                return `Due <span class="font-semibold text-orange-500">today</span> at ${dueDate.toLocaleTimeString([], timeFormat)}`;
-            }
-            if (dayDiff === 1) {
-                return `Due <span class="font-semibold text-yellow-500">tomorrow</span> at ${dueDate.toLocaleTimeString([], timeFormat)}`;
-            }
-            if (dayDiff > 1 && dayDiff <= 7) {
-                return `Due in <span class="font-semibold text-cyan-600">${dayDiff} days</span> (${dueDate.toLocaleDateString([], { weekday: 'short' })})`;
-            }
-            return `Due: ${dueDate.toLocaleDateString()} ${dueDate.toLocaleTimeString([], timeFormat)}`;
-        }
-
-
-        // --- Authentication Logic ---
-        onAuthStateChanged(auth, user => {
-            if (user) {
-                currentUserId = user.uid;
-                loginScreen.classList.add('hidden');
-                appScreen.classList.remove('hidden');
-                setInitialMonth();
-                initializeChart();
-                updateMonthDisplay(selectedYearMonth);
-                loadingSpinner.classList.add('opacity-0', 'pointer-events-none');
+            // Utility Functions
+            function showNotification(message, type = 'info') {
+                const notification = document.createElement('div');
+                const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
                 
-                if (user.isAnonymous) {
-                    userInfoDiv.innerHTML = `<p class="text-sm text-gray-500 subtitle">Guest User</p>`;
-                } else {
-                    userInfoDiv.innerHTML = `
-                        <p class="font-bold text-amber-900">${user.displayName}</p>
-                        <p class="text-xs text-gray-500 subtitle">${user.email}</p>
-                    `;
+                // Use a standard modal/message box instead of alert() or confirm()
+                notification.className = `${bgColor} text-white px-4 py-3 rounded-lg shadow-lg transform transition-all duration-300 translate-x-full opacity-0`;
+                notification.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <span>${message}</span>
+                        <button class="ml-4 text-white hover:text-gray-200" onclick="this.parentElement.parentElement.remove()">×</button>
+                    </div>
+                `;
+                
+                notificationContainer.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.classList.remove('translate-x-full', 'opacity-0');
+                }, 100);
+                
+                setTimeout(() => {
+                    if (notification.parentElement) {
+                        notification.classList.add('translate-x-full', 'opacity-0');
+                        setTimeout(() => notification.remove(), 300);
+                    }
+                }, 5000);
+            }
+
+            function showConfirmationModal(message, onConfirm) {
+                // Remove any existing modal
+                document.getElementById('confirmation-modal')?.remove();
+
+                const modal = document.createElement('div');
+                modal.id = 'confirmation-modal';
+                modal.className = 'fixed inset-0 z-[100] bg-black bg-opacity-50 flex items-center justify-center p-4';
+                modal.innerHTML = `
+                    <div class="bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full card-style">
+                        <p class="text-lg font-semibold mb-4 text-gray-800">${message}</p>
+                        <div class="flex justify-end space-x-3">
+                            <button id="modal-cancel" class="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-lg font-medium transition-colors">Cancel</button>
+                            <button id="modal-confirm" class="px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg font-medium transition-colors">Confirm</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+
+                document.getElementById('modal-cancel').onclick = () => modal.remove();
+                document.getElementById('modal-confirm').onclick = () => {
+                    onConfirm();
+                    modal.remove();
+                };
+            }
+
+            function formatCurrency(amount) {
+                // Ensure correct currency formatting (INR)
+                return new Intl.NumberFormat('en-IN', {
+                    style: 'currency',
+                    currency: 'INR'
+                }).format(amount || 0);
+            }
+
+            function setInitialMonth() {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = (now.getMonth() + 1).toString().padStart(2, '0');
+                selectedYearMonth = `${year}-${month}`;
+                monthSelector.value = selectedYearMonth;
+            }
+
+            function getRelativeDueDate(dueDateString) {
+                const now = new Date();
+                const dueDate = new Date(dueDateString);
+                const diffTime = dueDate.getTime() - now.getTime();
+                
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const dueDay = new Date(dueDateString);
+                dueDay.setHours(0, 0, 0, 0);
+                
+                // Calculate day difference for relative labels (Today/Tomorrow)
+                const dayDiff = Math.round((dueDay.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+                const timeFormat = { hour: '2-digit', minute: '2-digit' };
+
+                if (diffTime < 0) {
+                    return `<span class="text-red-500 font-semibold">Overdue</span>`;
                 }
-                setupListeners(currentUserId);
-            } else {
-                currentUserId = null;
-                loginScreen.classList.remove('hidden');
-                appScreen.classList.add('hidden');
-                loadingSpinner.classList.add('opacity-0', 'pointer-events-none');
-                unsubscribeAll();
-            }
-        });
+                if (dayDiff === 0) {
+                    return `Due <span class="font-semibold text-orange-500">today</span> at ${dueDate.toLocaleTimeString([], timeFormat)}`;
+                }
+                if (dayDiff === 1) {
+                    return `Due <span class="font-semibold text-yellow-500">tomorrow</span> at ${dueDate.toLocaleTimeString([], timeFormat)}`;
+                }
+                if (dayDiff > 1 && dayDiff <= 7) {
+                    return `Due in <span class="font-semibold text-cyan-600">${dayDiff} days</span> (${dueDate.toLocaleDateString([], { weekday: 'short' })})`;
+                }
 
-        googleLoginBtn.addEventListener('click', () => signInWithPopup(auth, new GoogleAuthProvider()).catch(console.error));
-        guestLoginBtn.addEventListener('click', () => signInAnonymously(auth).catch(console.error));
-        logoutBtn.addEventListener('click', () => signOut(auth));
-        
-        monthSelector.addEventListener('change', () => {
-            selectedYearMonth = monthSelector.value;
-            if (currentUserId) {
-                updateMonthDisplay(selectedYearMonth);
-                setupListeners(currentUserId);
-            }
-        });
-        
-        // --- Firestore Listeners ---
-        function setupListeners(userId) {
-            unsubscribeAll();
-            if (!selectedYearMonth) return;
-
-            const budgetRef = doc(db, `artifacts/${appId}/users/${userId}/monthlyData`, selectedYearMonth);
-            unsubscribeBudget = onSnapshot(budgetRef, (doc) => {
-                const data = doc.data();
-                currentBudget = data?.total || 0;
-                updateBudgetUI();
-            });
-
-            const expensesRef = collection(db, `artifacts/${appId}/users/${userId}/monthlyData/${selectedYearMonth}/expenses`);
-            const q = query(expensesRef);
-            unsubscribeExpenses = onSnapshot(q, (snapshot) => {
-                currentExpenses = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                updateExpensesUI();
-            });
-            
-            const notesRef = collection(db, `artifacts/${appId}/users/${userId}/monthlyData/${selectedYearMonth}/notes`);
-            const notesQuery = query(notesRef, orderBy("createdAt", "desc"));
-            unsubscribeNotes = onSnapshot(notesQuery, (snapshot) => {
-                const allNotes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                renderNotesUI(allNotes);
-            });
-        }
-        
-        function unsubscribeAll() {
-            unsubscribeBudget();
-            unsubscribeExpenses();
-            unsubscribeNotes();
-        }
-
-        // --- UI Update Functions ---
-        function updateMonthDisplay(yearMonth) {
-            if (!yearMonth) return;
-            const [year, month] = yearMonth.split('-');
-            const date = new Date(year, month - 1, 1);
-            const monthName = date.toLocaleString('default', { month: 'long' });
-            const displayString = `${monthName} ${year}`;
-            
-            if (upcomingTitleEl) upcomingTitleEl.textContent = `Upcoming Planned Expenses for ${displayString}`;
-            if (paidTitleEl) paidTitleEl.textContent = `Paid Expenses History for ${displayString}`;
-            if (chartTitleEl) chartTitleEl.textContent = `Category Spending for ${displayString}`;
-        }
-
-        function updateBudgetUI() {
-            totalBudgetEl.textContent = `₹${currentBudget.toFixed(2)}`;
-            calculateAndDisplayTotals();
-        }
-
-        async function updateExpensesUI() {
-            const paid = currentExpenses.filter(e => e.isPaid);
-            const upcoming = currentExpenses.filter(e => !e.isPaid);
-            
-            upcoming.sort((a,b) => new Date(a.dueDate) - new Date(b.dueDate));
-            paid.sort((a,b) => new Date(b.paidAt?.seconds * 1000) - new Date(a.paidAt?.seconds * 1000));
-
-            renderExpenseList(upcomingList, upcoming, noUpcomingMsg, true);
-            renderExpenseList(paidList, paid, noPaidMsg, false);
-            updateCategoryChart(paid);
-            
-            checkAndNotifyDueExpenses(upcoming);
-            calculateAndDisplayTotals();
-            const totalSpent = paid.reduce((sum, e) => sum + e.amount, 0);
-            await syncMonthlySpentTotal(selectedYearMonth, totalSpent);
-        }
-
-        function renderExpenseList(listElement, expenses, noItemsMsg, isUpcoming) {
-            listElement.innerHTML = '';
-            if (expenses.length === 0) {
-                listElement.innerHTML = `<p class="text-gray-500 text-center py-4 subtitle">${noItemsMsg.textContent}</p>`;
-                return;
+                // Default full date/time format
+                return `Due: ${dueDate.toLocaleDateString()} ${dueDate.toLocaleTimeString([], timeFormat)}`;
             }
 
-            expenses.forEach(exp => {
-                const item = document.createElement('div');
-                item.className = 'flex items-center gap-4 bg-gray-50/50 p-3 rounded-lg hover:bg-gray-100 transition-colors duration-200';
-                item.innerHTML = `
-                    <div class="flex-shrink-0">${categoryIcons[exp.category] || categoryIcons.Other}</div>
-                    <div class="flex-grow">
-                        <p class="text-lg font-bold text-amber-900">${exp.name}</p>
-                        <p class="text-xs text-gray-600 subtitle">${isUpcoming ? getRelativeDueDate(exp.dueDate) : `Paid on ${new Date(exp.paidAt.seconds * 1000).toLocaleDateString()}`}</p>
-                    </div>
-                    <p class="font-bold text-xl text-amber-950">₹${exp.amount.toFixed(2)}</p>
-                    <div class="flex items-center gap-2">
-                        ${isUpcoming ? `<button data-id="${exp.id}" class="pay-btn bg-green-600/90 p-2 rounded-full hover:bg-green-600 text-white transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pointer-events-none"><path d="M20 6 9 17l-5-5"/></svg></button>` : ''}
-                        <button data-id="${exp.id}" class="delete-btn bg-red-600/90 p-2 rounded-full hover:bg-red-600 text-white transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pointer-events-none"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></button>
-                    </div>
-                `;
-                listElement.appendChild(item);
-            });
-        }
-        
-        function renderNotesUI(notes) {
-            notesList.innerHTML = '';
-            if (notes.length === 0) {
-                 notesList.innerHTML = `<p id="no-notes" class="text-gray-500 text-center py-4 subtitle">No important notes for this month.</p>`;
-                return;
+            // LocalStorage Functions
+            function getBudgetKey(yearMonth) {
+                return `budget_${yearMonth}`;
+            }
+            function getExpensesKey(yearMonth) {
+                return `expenses_${yearMonth}`;
+            }
+            function getNotesKey(yearMonth) {
+                return `notes_${yearMonth}`;
             }
 
-            notes.forEach(note => {
-                const item = document.createElement('div');
-                item.className = 'flex items-start justify-between gap-4 bg-yellow-50/70 p-3 rounded-lg text-sm';
-                item.innerHTML = `
-                    <p class="flex-grow text-amber-950 font-medium">${note.text.replace(/\n/g, '<br>')}</p>
-                    <div class="flex-shrink-0">
-                        <button data-id="${note.id}" class="delete-note-btn text-red-500 hover:text-red-700 transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pointer-events-none"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                        </button>
-                    </div>
-                `;
-                notesList.appendChild(item);
-            });
-        }
-
-        function calculateAndDisplayTotals() {
-            const totalSpent = currentExpenses
-                .filter(e => e.isPaid)
-                .reduce((sum, e) => sum + e.amount, 0);
-
-            const remaining = currentBudget - totalSpent;
-            totalSpentEl.textContent = `₹${totalSpent.toFixed(2)}`;
-            remainingBudgetEl.textContent = `₹${remaining.toFixed(2)}`;
-            remainingBudgetEl.classList.toggle('text-yellow-600', remaining < 0);
-            remainingBudgetEl.classList.toggle('text-green-600', remaining >= 0);
-        }
-        
-        async function syncMonthlySpentTotal(yearMonth, spent) {
-            if (!currentUserId || !yearMonth) return;
-            const monthlyRef = doc(db, `artifacts/${appId}/users/${currentUserId}/monthlyData`, yearMonth);
-            await setDoc(monthlyRef, { totalSpent: spent }, { merge: true });
-        }
-
-
-        // --- Chart Logic ---
-        function initializeChart() {
-            if (expenseChart) {
-                expenseChart.destroy();
+            function loadBudget(yearMonth) {
+                const budget = localStorage.getItem(getBudgetKey(yearMonth));
+                return budget ? parseFloat(budget) : 0;
             }
-            const ctx = chartCanvas.getContext('2d');
-            expenseChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: [],
-                    datasets: [{
-                        label: 'Spent by Category',
-                        data: [],
-                        backgroundColor: '#C8B6FF', // Light Purple
-                        borderColor: '#A299FF', // Slightly darker purple
-                        borderWidth: 1,
-                        borderRadius: 4,
-                        barPercentage: 0.6,
-                        categoryPercentage: 0.7
-                    }]
-                },
-                options: {
-                    indexAxis: 'x', 
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return `Spent: ₹${context.parsed.y.toFixed(2)}`;
+
+            function saveBudget(yearMonth, amount) {
+                localStorage.setItem(getBudgetKey(yearMonth), amount.toString());
+            }
+
+            function loadExpenses(yearMonth) {
+                const expenses = localStorage.getItem(getExpensesKey(yearMonth));
+                return expenses ? JSON.parse(expenses) : [];
+            }
+
+            function saveExpenses(yearMonth, expenses) {
+                localStorage.setItem(getExpensesKey(yearMonth), JSON.stringify(expenses));
+            }
+
+            function loadNotes(yearMonth) {
+                const notes = localStorage.getItem(getNotesKey(yearMonth));
+                return notes ? JSON.parse(notes) : [];
+            }
+
+            function saveNotes(yearMonth, notes) {
+                localStorage.setItem(getNotesKey(yearMonth), JSON.stringify(notes));
+            }
+
+            // Chart Functions
+            function initializeChart() {
+                const ctx = chartCanvas.getContext('2d');
+                expenseChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: [],
+                        datasets: [{
+                            data: [],
+                            backgroundColor: [
+                                '#92400e', '#ea580c', '#eab308', '#65a30d', '#059669', // Custom color palette
+                                '#0891b2', '#2563eb', '#7c3aed', '#c2410c', '#6b7280'
+                            ],
+                            borderWidth: 0,
+                            hoverOffset: 10
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    padding: 20,
+                                    usePointStyle: true,
+                                    font: { size: 12 }
                                 }
                             }
                         }
-                    },
-                    scales: {
-                        y: { 
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) { return '₹' + value; }
-                            }
-                        }
                     }
-                }
-            });
-        }
-        
-        function updateCategoryChart(paidExpenses) {
-            if (!expenseChart) return;
-
-            const categoryTotals = paidExpenses.reduce((acc, expense) => {
-                acc[expense.category] = (acc[expense.category] || 0) + expense.amount;
-                return acc;
-            }, {});
-
-            const sortedCategories = Object.entries(categoryTotals).sort((a, b) => b[1] - a[1]);
-
-            const labels = sortedCategories.map(item => item[0]);
-            const values = sortedCategories.map(item => item[1]);
-
-            expenseChart.data.labels = labels;
-            expenseChart.data.datasets[0].data = values;
-            expenseChart.update();
-        }
-
-
-        // --- Notifications ---
-        function checkAndNotifyDueExpenses(upcomingExpenses) {
-            const now = new Date();
-            const oneDayFromNow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-
-            upcomingExpenses.forEach(exp => {
-                const dueDate = new Date(exp.dueDate);
-                if (dueDate <= oneDayFromNow && dueDate >= now) {
-                    createNotification(`Reminder: "${exp.name}" is due within 24 hours!`, 'info');
-                }
-            });
-        }
-
-        let notificationCount = 0;
-        let shownNotifications = new Set();
-
-        function createNotification(message, type = 'info') {
-            const messageId = message + type;
-            if(shownNotifications.has(messageId)) return;
-
-            shownNotifications.add(messageId);
-            
-            const id = `notif-${notificationCount++}`;
-            const bgColor = type === 'warn' ? 'bg-red-600' : 'bg-blue-600';
-
-            const notification = document.createElement('div');
-            notification.id = id;
-            notification.className = `w-full ${bgColor} text-white p-4 rounded-lg shadow-lg flex justify-between items-center transition-all duration-300 transform animate-fade-in-right`;
-            notification.innerHTML = `
-                <span>${message}</span>
-                <button class="ml-4 text-white font-bold">&times;</button>
-            `;
-            
-            notificationContainer.appendChild(notification);
-
-            const dismiss = () => {
-                notification.classList.add('opacity-0');
-                setTimeout(() => {
-                    notification.remove();
-                    shownNotifications.delete(messageId);
-                }, 300);
-            };
-
-            notification.querySelector('button').addEventListener('click', dismiss);
-            setTimeout(dismiss, 5000);
-        }
-
-        // --- Form & Action Handlers ---
-        budgetForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const total = parseFloat(budgetInput.value);
-            if (isNaN(total) || total < 0 || !currentUserId || !selectedYearMonth) return;
-            
-            const budgetRef = doc(db, `artifacts/${appId}/users/${currentUserId}/monthlyData`, selectedYearMonth);
-            await setDoc(budgetRef, { total }, { merge: true });
-            budgetInput.value = '';
-        });
-
-        expenseForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const name = expenseNameInput.value.trim();
-            const amount = parseFloat(expenseAmountInput.value);
-            const category = expenseCategorySelect.value;
-            const dueDate = expenseDueDateInput.value;
-            
-            if (!name || isNaN(amount) || amount <= 0 || !dueDate || !currentUserId || !selectedYearMonth) return;
-            
-            const expensesRef = collection(db, `artifacts/${appId}/users/${currentUserId}/monthlyData/${selectedYearMonth}/expenses`);
-            await addDoc(expensesRef, { name, amount, category, dueDate, isPaid: false, createdAt: new Date() });
-            expenseForm.reset();
-        });
-
-        notesForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const text = noteInput.value.trim();
-            if (!text || !currentUserId || !selectedYearMonth) return;
-
-            const notesRef = collection(db, `artifacts/${appId}/users/${currentUserId}/monthlyData/${selectedYearMonth}/notes`);
-            await addDoc(notesRef, { text, createdAt: new Date() });
-            noteInput.value = '';
-            noteInput.style.height = 'auto';
-        });
-
-        noteInput.addEventListener('input', () => {
-            noteInput.style.height = 'auto';
-            noteInput.style.height = (noteInput.scrollHeight) + 'px';
-        });
-
-        document.body.addEventListener('click', async (e) => {
-            const target = e.target.closest('button');
-            if (!target || !currentUserId || !selectedYearMonth) return;
-
-            const id = target.dataset.id;
-            if (!id) return;
-
-            if (target.classList.contains('pay-btn')) {
-                const originalExpenseRef = doc(db, `artifacts/${appId}/users/${currentUserId}/monthlyData/${selectedYearMonth}/expenses`, id);
-                const now = new Date();
-                const paidYear = now.getFullYear();
-                const paidMonth = (now.getMonth() + 1).toString().padStart(2, '0');
-                const paidYearMonth = `${paidYear}-${paidMonth}`;
-
-                if (paidYearMonth === selectedYearMonth) {
-                    await updateDoc(originalExpenseRef, { isPaid: true, paidAt: now });
-                } else {
-                    const expenseDoc = await getDoc(originalExpenseRef);
-                    if (expenseDoc.exists()) {
-                        const expenseData = expenseDoc.data();
-                        const destinationRef = collection(db, `artifacts/${appId}/users/${currentUserId}/monthlyData/${paidYearMonth}/expenses`);
-                        await addDoc(destinationRef, { ...expenseData, isPaid: true, paidAt: now });
-                        await deleteDoc(originalExpenseRef);
-                    }
-                }
-            } else if (target.classList.contains('delete-btn')) {
-                const originalExpenseRef = doc(db, `artifacts/${appId}/users/${currentUserId}/monthlyData/${selectedYearMonth}/expenses`, id);
-                await deleteDoc(originalExpenseRef);
-            } else if (target.classList.contains('delete-note-btn')) {
-                 const noteRef = doc(db, `artifacts/${appId}/users/${currentUserId}/monthlyData/${selectedYearMonth}/notes`, id);
-                await deleteDoc(noteRef);
+                });
             }
-        });
 
+            function updateChart(expenses) {
+                const categoryTotals = {};
+                // Only consider paid expenses for the spending breakdown chart
+                expenses.filter(expense => expense.paid).forEach(expense => {
+                    categoryTotals[expense.category] = (categoryTotals[expense.category] || 0) + expense.amount;
+                });
+                
+                const categories = Object.keys(categoryTotals);
+                const amounts = Object.values(categoryTotals);
+                
+                // Handle case where there are no paid expenses
+                if (categories.length === 0) {
+                    expenseChart.data.labels = ['No paid expenses yet'];
+                    expenseChart.data.datasets[0].data = [1];
+                    expenseChart.data.datasets[0].backgroundColor = ['#e5e7eb'];
+                } else {
+                    expenseChart.data.labels = categories;
+                    expenseChart.data.datasets[0].data = amounts;
+                    // Reset to the full color palette if data exists
+                    expenseChart.data.datasets[0].backgroundColor = [
+                        '#92400e', '#ea580c', '#eab308', '#65a30d', '#059669',
+                        '#0891b2', '#2563eb', '#7c3aed', '#c2410c', '#6b7280'
+                    ];
+                }
+                
+                expenseChart.update();
+            }
+
+            // UI Update Functions
+            function updateBudgetDisplay() {
+                // Calculate total spent only from items marked as paid
+                const totalSpent = currentExpenses.filter(expense => expense.paid)
+                    .reduce((sum, expense) => sum + expense.amount, 0);
+                const remaining = currentBudget - totalSpent;
+                
+                totalBudgetEl.textContent = formatCurrency(currentBudget);
+                totalSpentEl.textContent = formatCurrency(totalSpent);
+                remainingBudgetEl.textContent = formatCurrency(remaining);
+                
+                // Update remaining budget text color based on spending status
+                if (remaining < 0) {
+                    remainingBudgetEl.className = 'text-4xl font-bold text-red-600';
+                } else if (remaining < currentBudget * 0.2) {
+                    remainingBudgetEl.className = 'text-4xl font-bold text-yellow-600';
+                } else {
+                    remainingBudgetEl.className = 'text-4xl font-bold text-green-600';
+                }
+            }
+
+            function updateExpenseLists() {
+                const now = new Date();
+                // Filter upcoming expenses: not paid AND due date is in the future/today
+                const upcoming = currentExpenses
+                    .filter(expense => !expense.paid && new Date(expense.dueDate) >= now)
+                    .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate)); // Sort by nearest due date
+
+                const paid = currentExpenses
+                    .filter(expense => expense.paid)
+                    .sort((a, b) => new Date(b.paidDate) - new Date(a.paidDate)); // Sort by most recently paid
+
+                
+                // 1. Update upcoming expenses list
+                if (upcoming.length === 0) {
+                    upcomingList.innerHTML = '<p id="no-upcoming" class="text-gray-500 text-center py-4 subtitle">No upcoming expenses planned.</p>';
+                } else {
+                    upcomingList.innerHTML = upcoming.map(expense => `
+                        <div class="flex items-start justify-between p-4 bg-gray-50 rounded-lg border-l-4 border-amber-500">
+                            <div class="flex items-start gap-3 flex-grow">
+                                <div class="flex-shrink-0">${categoryIcons[expense.category] || categoryIcons.Other}</div>
+                                <div class="flex-grow">
+                                    <h4 class="font-semibold text-gray-900">${expense.name}</h4>
+                                    <p class="text-sm text-gray-600">${expense.category}</p>
+                                    <p class="text-sm text-gray-500">${getRelativeDueDate(expense.dueDate)}</p>
+                                </div>
+                                <div class="text-right flex flex-col justify-center items-end">
+                                    <p class="font-bold text-amber-900">${formatCurrency(expense.amount)}</p>
+                                </div>
+                            </div>
+                            <button onclick="markExpenseAsPaid('${expense.id}')" class="ml-3 p-2 bg-green-600 hover:bg-green-700 text-white rounded-full transition-colors self-center flex-shrink-0" title="Mark as Paid">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="pointer-events-none"><path d="M20 6 9 17l-5-5"/></svg>
+                            </button>
+                        </div>
+                    `).join('');
+                }
+                
+                // 2. Update paid expenses list
+                if (paid.length === 0) {
+                    paidList.innerHTML = '<p id="no-paid" class="text-gray-500 text-center py-4 subtitle">No paid expenses yet.</p>';
+                } else {
+                    paidList.innerHTML = paid.map(expense => `
+                        <div class="flex items-start justify-between p-4 bg-gray-50 rounded-lg border-l-4 border-green-500">
+                            <div class="flex items-start gap-3 flex-grow">
+                                <div class="flex-shrink-0">${categoryIcons[expense.category] || categoryIcons.Other}</div>
+                                <div class="flex-grow">
+                                    <h4 class="font-semibold text-gray-900">${expense.name}</h4>
+                                    <p class="text-sm text-gray-600">${expense.category}</p>
+                                    <p class="text-sm text-green-600">Paid on ${new Date(expense.paidDate).toLocaleDateString()}</p>
+                                </div>
+                                <div class="text-right flex flex-col justify-center items-end">
+                                    <p class="font-bold text-green-700">${formatCurrency(expense.amount)}</p>
+                                </div>
+                            </div>
+                            <button onclick="deleteExpense('${expense.id}')" class="ml-3 p-2 bg-red-600 hover:bg-red-700 text-white rounded-full transition-colors self-center flex-shrink-0" title="Delete Expense">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2M10 11v6M14 11v6"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    `).join('');
+                }
+                
+                // 3. Update titles with counts
+                upcomingTitleEl.textContent = `Upcoming Planned Expenses (${upcoming.length})`;
+                paidTitleEl.textContent = `Paid Expenses History (${paid.length})`;
+            }
+
+            function updateNotesList() {
+                if (currentNotes.length === 0) {
+                    notesList.innerHTML = '<p id="no-notes" class="text-gray-500 text-center py-4 subtitle">No important notes for this month.</p>';
+                } else {
+                    notesList.innerHTML = currentNotes.map(note => `
+                        <div class="flex items-start justify-between p-3 bg-blue-50 rounded-lg border-l-4 border-sky-500">
+                            <div class="flex-grow">
+                                <p class="text-gray-800">${note.text}</p>
+                                <p class="text-xs text-gray-500 mt-1">Added on ${new Date(note.createdAt).toLocaleDateString()}</p>
+                            </div>
+                            <button onclick="deleteNote('${note.id}')" class="ml-3 p-1 bg-red-600 hover:bg-red-700 text-white rounded transition-colors flex-shrink-0" title="Delete Note">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2M10 11v6M14 11v6"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    `).join('');
+                }
+            }
+
+            // Data Functions
+            function loadMonthData(yearMonth) {
+                currentBudget = loadBudget(yearMonth);
+                currentExpenses = loadExpenses(yearMonth);
+                currentNotes = loadNotes(yearMonth);
+                
+                budgetInput.value = currentBudget || '';
+                
+                updateBudgetDisplay();
+                updateExpenseLists();
+                updateNotesList();
+                updateChart(currentExpenses);
+                
+                // Update chart title to show current month/year
+                chartTitleEl.textContent = `Category Spending for ${new Date(yearMonth + '-01').toLocaleDateString([], { month: 'long', year: 'numeric' })}`;
+            }
+
+            function markExpenseAsPaid(expenseId) {
+                const expense = currentExpenses.find(exp => exp.id === expenseId);
+                if (expense) {
+                    expense.paid = true;
+                    expense.paidDate = new Date().toISOString(); // Store payment date
+                    saveExpenses(selectedYearMonth, currentExpenses);
+                    
+                    // Re-render all elements affected by state change
+                    updateBudgetDisplay();
+                    updateExpenseLists();
+                    updateChart(currentExpenses);
+                    
+                    showNotification(`"${expense.name}" marked as paid!`, 'success');
+                }
+            }
+
+            function deleteExpense(expenseId) {
+                showConfirmationModal('Are you sure you want to permanently delete this expense?', () => {
+                    currentExpenses = currentExpenses.filter(exp => exp.id !== expenseId);
+                    saveExpenses(selectedYearMonth, currentExpenses);
+                    
+                    // Re-render all elements affected by state change
+                    updateBudgetDisplay();
+                    updateExpenseLists();
+                    updateChart(currentExpenses);
+                    
+                    showNotification('Expense deleted successfully!', 'success');
+                });
+            }
+
+            function deleteNote(noteId) {
+                showConfirmationModal('Are you sure you want to delete this note?', () => {
+                    currentNotes = currentNotes.filter(note => note.id !== noteId);
+                    saveNotes(selectedYearMonth, currentNotes);
+                    updateNotesList();
+                    showNotification('Note deleted successfully!', 'success');
+                });
+            }
+
+            // Event Listeners and Initialization
+            function initializeAppScreen() {
+                loginScreen.classList.add('hidden');
+                appScreen.classList.remove('hidden');
+                setInitialMonth(); // Set the default month
+                initializeChart(); // Create the chart instance
+                loadMonthData(selectedYearMonth); // Load initial data for the current month
+                // Hide spinner gracefully
+                loadingSpinner.classList.add('opacity-0', 'pointer-events-none');
+            }
+
+            // Initial DOM Content Loaded Setup
+            document.addEventListener('DOMContentLoaded', function() {
+                // Ensure the loading spinner is hidden after everything is parsed/rendered
+                setTimeout(() => {
+                    loadingSpinner.classList.add('opacity-0', 'pointer-events-none');
+                }, 500); // 500ms delay to ensure smooth start
+
+                // Start tracking button listener
+                startTrackingBtn.addEventListener('click', initializeAppScreen);
+                
+                // Month selector listener
+                monthSelector.addEventListener('change', function() {
+                    selectedYearMonth = this.value;
+                    loadMonthData(selectedYearMonth);
+                });
+                
+                // Budget form submission
+                budgetForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const amount = parseFloat(budgetInput.value);
+                    if (amount >= 0) {
+                        currentBudget = amount;
+                        saveBudget(selectedYearMonth, amount);
+                        updateBudgetDisplay();
+                        showNotification(`Budget set to ${formatCurrency(amount)} for ${new Date(selectedYearMonth + '-01').toLocaleDateString([], { month: 'long', year: 'numeric' })}`, 'success');
+                    } else {
+                        showNotification('Budget amount must be positive.', 'error');
+                    }
+                });
+                
+                // Expense form submission
+                expenseForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const expense = {
+                        id: crypto.randomUUID(), // Use a more robust UUID for ID
+                        name: expenseNameInput.value.trim(),
+                        amount: parseFloat(expenseAmountInput.value),
+                        category: expenseCategorySelect.value,
+                        dueDate: expenseDueDateInput.value,
+                        paid: false,
+                        createdAt: new Date().toISOString()
+                    };
+                    
+                    currentExpenses.push(expense);
+                    saveExpenses(selectedYearMonth, currentExpenses);
+                    
+                    // Re-render components
+                    updateBudgetDisplay();
+                    updateExpenseLists();
+                    updateChart(currentExpenses);
+                    
+                    expenseForm.reset();
+                    showNotification(`Expense "${expense.name}" added successfully!`, 'success');
+                });
+                
+                // Notes form submission
+                notesForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const note = {
+                        id: crypto.randomUUID(),
+                        text: noteInput.value.trim(),
+                        createdAt: new Date().toISOString()
+                    };
+                    
+                    currentNotes.push(note);
+                    saveNotes(selectedYearMonth, currentNotes);
+                    updateNotesList();
+                    
+                    noteInput.value = '';
+                    showNotification('Note added successfully!', 'success');
+                });
+                
+            });
+
+            // Expose required functions to the global scope for inline HTML event handlers
+            window.markExpenseAsPaid = markExpenseAsPaid;
+            window.deleteExpense = deleteExpense;
+            window.deleteNote = deleteNote;
+        })();
     </script>
 </body>
 </html>
